@@ -18,7 +18,35 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // 允许的源列表
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001',
+    ];
+    
+    // 从环境变量读取额外的允许源（用逗号分隔）
+    const additionalOrigins = process.env.CORS_ORIGINS?.split(',').map(s => s.trim()).filter(Boolean) || [];
+    const allAllowedOrigins = [...allowedOrigins, ...additionalOrigins];
+    
+    // 开发环境：允许所有源（包括 undefined，如 Postman 等工具）
+    // 生产环境：只允许指定的源
+    if (!origin || allAllowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('不允许的 CORS 源'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // 请求日志中间件

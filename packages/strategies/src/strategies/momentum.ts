@@ -76,7 +76,7 @@ export class MomentumStrategy extends BaseStrategy {
         side,
         price: currentPrice,
         size: this.config.size,
-        orderType: 'IOC',
+        orderType: 'GTC',
       });
 
       this.log(`动量交易：${side} ${this.config.size} @ ${currentPrice.toFixed(4)}，动量 ${(momentum * 100).toFixed(2)}%`);
