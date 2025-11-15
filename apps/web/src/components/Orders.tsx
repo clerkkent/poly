@@ -191,14 +191,14 @@ export default function Orders() {
             label="价格"
             rules={[{ required: true, message: '请输入价格' }]}
           >
-            <InputNumber min={0} step={0.0001} style={{ width: '100%' }} />
+            <Input min={0} step={0.0001} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item
             name="size"
             label="数量"
             rules={[{ required: true, message: '请输入数量' }]}
           >
-            <InputNumber min={0} step={0.1} style={{ width: '100%' }} />
+            <Input min={0} step={0.1} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item name="orderType" label="订单类型" initialValue="GTC">
             <Radio.Group>

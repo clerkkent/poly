@@ -9,16 +9,17 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@ethersproject/wallet": "5.8.0",
     "@poly/shared": "workspace:*",
     "@polymarket/clob-client": "^4.22.8",
-    "@ethersproject/wallet": "5.8.0",
-    "https-proxy-agent": "^7.0.2",
-    "http-proxy-agent": "^7.0.1"
+    "global-agent": "^3.0.0",
+    "http-proxy-agent": "^7.0.1",
+    "https-proxy-agent": "^7.0.2"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.1",
+    "@types/global-agent": "^3.0.0",
     "@types/node": "^20.10.0",
     "typescript": "^5.3.3"
   }
 }
-

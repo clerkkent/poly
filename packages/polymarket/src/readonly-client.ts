@@ -1,4 +1,4 @@
-import { ClobClient, SignatureType  } from '@polymarket/clob-client';
+import { ClobClient  } from '@polymarket/clob-client';
 import { Wallet } from '@ethersproject/wallet';
 import { Market, PriceData } from '@poly/shared';
 
@@ -7,7 +7,7 @@ import { Market, PriceData } from '@poly/shared';
  * 用于监控行情，不需要私钥（使用一个临时钱包）
  */
 export class PolymarketReadonlyClient {
-  private client: ClobClient;
+  private client!: ClobClient;
   private chainId: number;
 
   constructor(chainId: number = 137, baseURL?: string) {

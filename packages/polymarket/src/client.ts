@@ -1,8 +1,9 @@
-import { ClobClient, Side, OrderType, UserOrder, OpenOrder, TradeParams, Trade } from '@polymarket/clob-client';
+import { ClobClient, Side, OrderType, UserOrder, OpenOrder, TradeParams } from '@polymarket/clob-client';
 import { Wallet } from '@ethersproject/wallet';
 import { Account, Market, Order, PriceData } from '@poly/shared';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { HttpProxyAgent } from 'http-proxy-agent';
+import { bootstrap } from 'global-agent';
 
 export interface PolymarketConfig {
   privateKey: string; // 私钥
@@ -23,6 +24,43 @@ export class PolymarketClient {
   constructor(config: PolymarketConfig) {
     this.config = config;
     
+    // 配置代理（在创建 ClobClient 之前）
+    // 使用 global-agent 来为所有 HTTP/HTTPS 请求配置代理
+    if (config.proxy) {
+      // 设置全局代理环境变量（global-agent 会读取这些变量）
+      if (!process.env.GLOBAL_AGENT_HTTP_PROXY) {
+        process.env.GLOBAL_AGENT_HTTP_PROXY = config.proxy;
+      }
+      if (!process.env.GLOBAL_AGENT_HTTPS_PROXY) {
+        process.env.GLOBAL_AGENT_HTTPS_PROXY = config.proxy;
+      }
+      // 同时设置标准环境变量（某些库可能使用）
+      if (!process.env.HTTP_PROXY) {
+        process.env.HTTP_PROXY = config.proxy;
+      }
+      if (!process.env.HTTPS_PROXY) {
+        process.env.HTTPS_PROXY = config.proxy;
+      }
+      // 某些库也使用小写变量
+      if (!process.env.http_proxy) {
+        process.env.http_proxy = config.proxy;
+      }
+      if (!process.env.https_proxy) {
+        process.env.https_proxy = config.proxy;
+      }
+      
+      // 启用 global-agent（只需要调用一次）
+      try {
+        bootstrap();
+        console.log(`[PolymarketClient] 🔄 已配置全局代理: ${config.proxy}`);
+      } catch (error: any) {
+        // 如果已经初始化过，忽略错误
+        if (!error.message?.includes('already')) {
+          console.warn(`[PolymarketClient] ⚠️  代理配置警告:`, error.message);
+        }
+      }
+    }
+    
     // 创建钱包签名者
     this.signer = new Wallet(config.privateKey);
     
@@ -30,22 +68,38 @@ export class PolymarketClient {
     const host = config.baseURL || 'https://clob.polymarket.com';
     const chainId = config.chainId || 137;
     
-    // 初始化 ClobClient
-    // 根据文档：ClobClient(host, chainId, signer, apiKey?, signatureType?, funder?)
-    console.log(config.funder, config.signatureType,config.privateKey, 'config.funder, config.signatureType');
-    if (config.funder && config.signatureType) {
-      // 使用代理地址和签名类型
-      this.client = new ClobClient(
-        host,
-        chainId,
-        this.signer,
-        undefined, // apiKey (可选)
-        config.signatureType,
-        config.funder
-      );
-    } else {
-      // 直接使用 EOA
-      this.client = new ClobClient(host, chainId, this.signer);
+    try {
+      // 初始化 ClobClient
+      // 根据文档：ClobClient(host, chainId, signer, apiKey?, signatureType?, funder?)
+      console.log(`[PolymarketClient] 🔧 初始化 ClobClient: host=${host}, chainId=${chainId}`);
+      if (config.funder && config.signatureType) {
+        // 使用代理地址和签名类型
+        this.client = new ClobClient(
+          host,
+          chainId,
+          this.signer,
+          undefined, // apiKey (可选)
+          config.signatureType,
+          config.funder
+        );
+      } else {
+        // 直接使用 EOA
+        this.client = new ClobClient(host, chainId, this.signer);
+      }
+      console.log(`[PolymarketClient] ✅ ClobClient 初始化成功`);
+    } catch (error: any) {
+      console.error(`[PolymarketClient] ❌ ClobClient 初始化失败:`, error.message || error);
+      // 如果是网络相关错误，提供更详细的提示
+      if (error.message?.includes('ETIMEDOUT') || error.message?.includes('ENOTFOUND') || error.message?.includes('ECONNREFUSED')) {
+        console.error(`[PolymarketClient] 💡 提示: 这可能是网络连接问题，请检查：`);
+        console.error(`   1. 网络连接是否正常`);
+        console.error(`   2. 是否需要配置代理（在 .env 文件中设置 HTTP_PROXY 或 HTTPS_PROXY）`);
+        console.error(`   3. 防火墙是否阻止了连接`);
+        if (!config.proxy) {
+          console.error(`   4. 当前未配置代理，如果本地网络无法直接访问，请配置代理`);
+        }
+      }
+      throw error;
     }
   }
 
@@ -140,7 +194,7 @@ export class PolymarketClient {
     side: 'BUY' | 'SELL';
     price: number;
     size: number;
-    orderType?: 'GTC' | 'FOK' | 'GTD';
+    orderType?: 'GTC' | 'FOK' | 'GTD' | 'IOC';
     negRisk?: boolean;
   }): Promise<Order> {
     try {

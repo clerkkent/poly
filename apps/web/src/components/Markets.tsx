@@ -133,8 +133,20 @@ export default function Markets() {
       title: '操作',
       key: 'action',
       render: (_: any, record: Market) => (
-        <Button type="link" onClick={() => setSelectedMarket(record)}>
-          查看详情
+        <Button 
+          type="link" 
+          onClick={() => {
+            // 将市场添加到监控列表
+            setMonitoredMarkets(prev => {
+              if (!prev.find(m => m.id === record.id)) {
+                return [...prev, record];
+              }
+              return prev;
+            });
+            message.success(`已添加 ${record.question || record.id} 到监控列表`);
+          }}
+        >
+          添加到监控
         </Button>
       ),
     },

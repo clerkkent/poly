@@ -108,10 +108,10 @@ export default function Strategies() {
               <Input />
             </Form.Item>
             <Form.Item name={['config', 'spread']} label="价差 (%)" rules={[{ required: true }]}>
-              <InputNumber min={0.01} max={1} step={0.01} style={{ width: '100%' }} />
+              <Input min={0.01} max={1} step={0.01} style={{ width: '100%' }} />
             </Form.Item>
             <Form.Item name={['config', 'size']} label="数量" rules={[{ required: true }]}>
-              <InputNumber min={0.1} step={0.1} style={{ width: '100%' }} />
+              <Input min={0.1} step={0.1} style={{ width: '100%' }} />
             </Form.Item>
           </>
         );
@@ -122,10 +122,10 @@ export default function Strategies() {
               <Input />
             </Form.Item>
             <Form.Item name={['config', 'momentumThreshold']} label="动量阈值 (%)" rules={[{ required: true }]}>
-              <InputNumber min={0.01} step={0.01} style={{ width: '100%' }} />
+              <Input min={0.01} step={0.01} style={{ width: '100%' }} />
             </Form.Item>
             <Form.Item name={['config', 'size']} label="数量" rules={[{ required: true }]}>
-              <InputNumber min={0.1} step={0.1} style={{ width: '100%' }} />
+              <Input min={0.1} step={0.1} style={{ width: '100%' }} />
             </Form.Item>
           </>
         );

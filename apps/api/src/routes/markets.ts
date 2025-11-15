@@ -17,7 +17,7 @@ marketsRouter.get('/', async (req, res) => {
       }
 
       const markets = await client.getMarkets({
-        limit: limit ? parseInt(limit as string) : 50,
+        limit: limit ? parseInt(limit as string) : 5,
         offset: offset ? parseInt(offset as string) : 0,
         active: active === 'true',
       });
@@ -28,7 +28,7 @@ marketsRouter.get('/', async (req, res) => {
     // 默认使用只读客户端（行情数据与 chainId 无关）
     console.log(`[Markets] 📊 获取市场列表（只读模式）`);
     const markets = await MarketService.getMarkets({
-      limit: limit ? parseInt(limit as string) : 50,
+      limit: limit ? parseInt(limit as string) : 5,
       offset: offset ? parseInt(offset as string) : 0,
       active: active === 'true',
     });

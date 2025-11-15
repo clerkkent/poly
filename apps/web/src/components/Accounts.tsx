@@ -183,7 +183,7 @@ export default function Accounts() {
             tooltip="137=Polygon 主网（默认）"
             initialValue={137}
           >
-            <InputNumber min={1} style={{ width: '100%' }} placeholder="137" disabled />
+            <Input min={1} style={{ width: '100%' }} placeholder="137" disabled />
           </Form.Item>
           <Form.Item name="enabled" label="启用" valuePropName="checked" initialValue={true}>
             <Switch />
