@@ -72,6 +72,47 @@ pnpm build
 pnpm start
 ```
 
+## 服务器部署（简化版）
+
+### 快速部署（3步）
+
+1. **上传代码到服务器**
+   ```bash
+   # 在本地打包
+   tar -czf polymarket.tar.gz --exclude=node_modules --exclude=.git .
+   
+   # 上传到服务器
+   scp polymarket.tar.gz root@你的服务器IP:/root/
+   ```
+
+2. **在服务器上运行一键部署脚本**
+   ```bash
+   # 解压代码
+   cd /root
+   tar -xzf polymarket.tar.gz
+   cd polymarket-quant-system
+   
+   # 运行部署脚本
+   chmod +x scripts/simple-deploy.sh
+   bash scripts/simple-deploy.sh
+   ```
+
+3. **配置防火墙**
+   ```bash
+   # Ubuntu
+   sudo ufw allow 3000/tcp
+   sudo ufw allow 3001/tcp
+   
+   # CentOS
+   sudo firewall-cmd --permanent --add-port=3000/tcp
+   sudo firewall-cmd --permanent --add-port=3001/tcp
+   sudo firewall-cmd --reload
+   ```
+
+**完成！** 访问 `http://你的服务器IP:3000`
+
+📖 **详细部署文档**：查看 [docs/SIMPLE_DEPLOYMENT.md](docs/SIMPLE_DEPLOYMENT.md)
+
 ## 功能特性
 
 - ✅ 多账户管理
